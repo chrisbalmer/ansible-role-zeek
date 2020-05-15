@@ -1,0 +1,12 @@
+---
+# defaults file for zeek
+zeek_home: /opt/zeek
+zeek_etc: "{{ zeek_home }}/etc"
+zeek_configs: "{{ zeek_home }}/share/zeek"
+zeek_site: "{{ zeek_configs }}/site"
+zeekctl: "{{ zeek_home }}/bin/zeekctl"
+
+
+zeek_interface: ens192
+
+zeek_logs_json: true

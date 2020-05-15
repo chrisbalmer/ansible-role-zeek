@@ -1,0 +1,13 @@
+---
+- name: "{{ ansible_os_family }} | Install Zeek Repository"
+  yum_repository:
+    name: zeek
+    description: The Zeek Network Security Monitor. (CentOS 7)
+    baseurl: "http://download.opensuse.org/repositories/security:/zeek/CentOS_{{ ansible_distribution_major_version }}/"
+    gpgkey: "http://download.opensuse.org/repositories/security:/zeek/CentOS_{{ ansible_distribution_major_version }}/repodata/repomd.xml.key"
+    gpgcheck: yes
+- name: "{{ ansible_os_family }} | Install Zeek LTS"
+  yum:
+    name: zeek-lts
+    state: latest
+

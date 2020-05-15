@@ -1,0 +1,66 @@
+---
+- name: "Main | Install for RedHat based distributions"
+  include: "redhat.yml"
+  when: ansible_os_family == "RedHat"
+
+
+- name: "Main | Add Zeek bin directory to global $PATH variable"
+  copy:
+    dest: /etc/profile.d/zeek-bin-directory.sh
+    content: 'export PATH=$PATH:{{ zeek_home }}/bin'
+
+- name: "Main | Configure Zeek Maintenance"
+  cron:
+    name: "Zeek Maintenance"
+    minute: "*/5"
+    user: "root"
+    job: "{{ zeekctl }} cron"
+    cron_file: "zeek_maintenance"
+
+- name: "Main | Configure Zeek Site"
+  template:
+    src: local.zeek.j2
+    dest: "{{ zeek_site }}/local.zeek"
+    mode: 0644
+    backup: yes
+  notify:
+    - Deploy Zeek Config
+
+- name: "Main | Configure Zeek Node"
+  template:
+    src: node.cfg.j2
+    dest: "{{ zeek_etc }}/node.cfg"
+    mode: 0644
+    backup: yes
+  notify:
+    - Deploy Zeek Config
+
+- name: Set ACLs for Existing Logs and Log Directories
+  acl:
+    etype: user
+    entity: splunk
+    follow: yes
+    path: "{{ item }}"
+    permissions: rX
+    state: present
+    recursive: yes
+    recalculate_mask: no_mask
+  with_items:
+    - /opt/zeek/spool/zeek
+    - /var/log
+    - /etc/
+
+- name: Set Default ACLs for New Log Files
+  acl:
+    default: yes
+    etype: user
+    entity: splunk
+    follow: yes
+    path: "{{ item }}"
+    permissions: rX
+    state: present
+    recursive: yes
+  with_items:
+    - /opt/zeek/spool/zeek
+    - /var/log
+    - /etc/
