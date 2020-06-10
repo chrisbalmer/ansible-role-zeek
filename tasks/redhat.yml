@@ -1,4 +1,9 @@
 ---
+- name: "{{ ansible_os_family }} | Install Prerequisites"
+  yum:
+    name: "{{ zeek_required_packages }}"
+    state: latest
+
 - name: "{{ ansible_os_family }} | Install Zeek Repository"
   yum_repository:
     name: zeek
@@ -6,8 +11,10 @@
     baseurl: "http://download.opensuse.org/repositories/security:/zeek/CentOS_{{ ansible_distribution_major_version }}/"
     gpgkey: "http://download.opensuse.org/repositories/security:/zeek/CentOS_{{ ansible_distribution_major_version }}/repodata/repomd.xml.key"
     gpgcheck: yes
+  when: zeek_role == "manager"
+
 - name: "{{ ansible_os_family }} | Install Zeek LTS"
   yum:
     name: zeek-lts
     state: latest
-
+  when: zeek_role == "manager"

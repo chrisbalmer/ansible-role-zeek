@@ -1,0 +1,31 @@
+---
+- name: "Main | Add Zeek bin directory to global $PATH variable"
+  copy:
+    dest: /etc/profile.d/zeek-bin-directory.sh
+    content: 'export PATH=$PATH:{{ zeek_home }}/bin'
+
+- name: "Main | Configure Zeek Maintenance"
+  cron:
+    name: "Zeek Maintenance"
+    minute: "*/5"
+    user: "root"
+    job: "{{ zeekctl }} cron"
+    cron_file: "zeek_maintenance"
+
+- name: "Main | Configure Zeek Site"
+  template:
+    src: local.zeek.j2
+    dest: "{{ zeek_site }}/local.zeek"
+    mode: 0644
+    backup: yes
+  notify:
+    - Deploy Zeek Config
+
+- name: "Main | Configure Zeek Node"
+  template:
+    src: node.cfg.j2
+    dest: "{{ zeek_etc }}/node.cfg"
+    mode: 0644
+    backup: yes
+  notify:
+    - Deploy Zeek Config
