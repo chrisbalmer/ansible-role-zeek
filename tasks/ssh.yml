@@ -1,0 +1,23 @@
+---
+- name: "SSH | Create SSH folder"
+  file:
+    path: /root/.ssh
+    mode: 0700
+    state: directory
+
+- name: "SSH | Configure SSH key for root"
+  openssh_keypair:
+    path: /root/.ssh/id_rsa
+    size: 4096
+    mode: 0600
+  register: manager_key
+  when: "'zeek_manager' in group_names"
+
+- name: "SSH | Add Manager Key to Authorized Keys"
+  lineinfile:
+    create: yes
+    line: "{{ hostvars[item]['manager_key']['public_key'] }}"
+    mode: 0600
+    path: "/root/.ssh/authorized_keys"
+  with_items: "{{ groups['zeek_manager'] }}"
+  when: "'zeek_manager' not in group_names"

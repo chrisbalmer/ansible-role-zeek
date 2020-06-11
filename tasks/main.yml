@@ -1,8 +1,11 @@
 ---
+- name: "Main | Configure SSH"
+  include: "ssh.yml"
+
 - name: "Main | Install for RedHat based distributions"
   include: "redhat.yml"
   when: ansible_os_family == "RedHat"
 
 - name: "Main | Configure Manager"
   include: "manager.yml"
-  when: zeek_role == "manager"
+  when: "'zeek_manager' in group_names"
